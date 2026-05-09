@@ -254,7 +254,7 @@ const App = () => {
             <Container fluid style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: isMobile ? '1fr' : '1fr 420px',
+                    gridTemplateColumns: isMobile ? '1fr' : '1fr 440px',
                     gap: '1.5rem',
                     alignItems: 'start'
                 }}>
@@ -357,7 +357,8 @@ const App = () => {
                         border: `1px solid ${currentTheme.border}`,
                         display: 'flex',
                         flexDirection: 'column',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        justifyContent: 'center'
                     }}>
                         <div style={{
                             fontWeight: '500',
@@ -370,10 +371,10 @@ const App = () => {
                         <div
                             id="mycanvas"
                             style={{
-                                width: '100%',
-                                aspectRatio: '1 / 1',
+                                width: '400px',
+                                height: '400px',
                                 background: theme === 'light' ? '#ffffff' : '#1a1a2e',
-                                borderRadius: '16px',
+                                borderRadius: '0px',        // ⬅️ Kotak tajam, tidak melengkung
                                 border: `2px solid ${currentTheme.canvasBorder}`,
                                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                             }}
