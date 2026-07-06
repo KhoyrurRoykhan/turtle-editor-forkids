@@ -225,7 +225,7 @@ const App = () => {
             }}>
                 <Container fluid>
                     <Navbar.Brand href="#" style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '1.5rem' }}>
-                        <FaCode />  bidGeometry
+                        <FaCode />  Turtle Geometry
                     </Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ backgroundColor: '#ffffff33', border: 'none' }} />
                     <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
