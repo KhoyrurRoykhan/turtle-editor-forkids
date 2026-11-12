@@ -5,8 +5,11 @@ import { dracula } from '@uiw/codemirror-theme-dracula';
 import { Button, Modal, Form, Navbar, Nav, Container } from 'react-bootstrap';
 import { BsArrowClockwise, BsPlayFill, BsFolder2Open, BsDownload, BsSave2, BsMoon, BsSun } from 'react-icons/bs';
 import { FaCode } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import HalamanBaru from './HalamanBaru';
 
-const App = () => {
+const HalamanUtama = () => {
     const [pythonCode, setPythonCode] = useState('');
     const [output, setOutput] = useState('');
     const [filename, setFilename] = useState('my_code');
@@ -229,6 +232,12 @@ const App = () => {
                     </Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ backgroundColor: '#ffffff33', border: 'none' }} />
                     <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
+                        <Nav.Link as={Link} to="/" style={{ color: '#ffffff', fontWeight: '500' }}>
+                            Halaman Utama
+                        </Nav.Link>
+                        <Nav.Link as={Link} to="/halaman-baru" style={{ color: '#ffffff', fontWeight: '500' }}>
+                            Halaman Baru
+                        </Nav.Link>
                         <Nav>
                             <Button
                                 variant="light"
@@ -649,6 +658,17 @@ const ActionButton = ({ onClick, icon, label, variant, disabled }) => {
         >
             {icon} {label}
         </button>
+    );
+};
+
+const App = () => {
+    return (
+        <Router>
+            <Routes>
+                <Route path="/" element={<HalamanUtama />} />
+                <Route path="/halaman-baru" element={<HalamanBaru />} />
+            </Routes>
+        </Router>
     );
 };
 
