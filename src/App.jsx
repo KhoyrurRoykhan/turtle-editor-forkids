@@ -6,7 +6,7 @@ import { Button, Modal, Form, Navbar, Nav, Container } from 'react-bootstrap';
 import { BsArrowClockwise, BsPlayFill, BsFolder2Open, BsDownload, BsSave2, BsMoon, BsSun } from 'react-icons/bs';
 import { FaCode } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import HalamanBaru from './HalamanBaru';
 
 const HalamanUtama = () => {
@@ -663,7 +663,7 @@ const ActionButton = ({ onClick, icon, label, variant, disabled }) => {
 
 const App = () => {
     return (
-        <Router>
+        <Router basename="/turtle-editor-forkids">
             <Routes>
                 <Route path="/" element={<HalamanUtama />} />
                 <Route path="/halaman-baru" element={<HalamanBaru />} />
