@@ -458,9 +458,11 @@ const HalamanBaru = () => {
 
 const CanvasGrid = ({ theme }) => {
     const gridColor = theme === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)';
-    const centerColor = theme === 'light' ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)';
-    const textColor = theme === 'light' ? '#666' : '#999';
-    
+    // Warna sumbu X dan Y dibuat lebih tegas
+    const axisXColor = theme === 'light' ? '#dc3545' : '#ff6b6b'; // Merah untuk sumbu X
+    const axisYColor = theme === 'light' ? '#0d6efd' : '#4dabf7'; // Biru untuk sumbu Y
+    const textColor = theme === 'light' ? '#555' : '#aaa';
+
     return (
         <svg
             width="400"
@@ -472,122 +474,89 @@ const CanvasGrid = ({ theme }) => {
                 pointerEvents: 'none'
             }}
         >
-            {/* Grid lines setiap 50px */}
+            {/* Definisi ujung panah untuk sumbu X dan Y */}
+            <defs>
+                <marker id="arrowX" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" fill={axisXColor} />
+                </marker>
+                <marker id="arrowY" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" fill={axisYColor} />
+                </marker>
+            </defs>
+
+            {/* 1. Garis Grid Kotak-kotak (setiap 50px, kecuali garis tengah) */}
             {Array.from({ length: 9 }, (_, i) => {
                 const pos = i * 50;
+                if (pos === 200) return null; // Lewati garis tengah agar digambar terpisah
                 return (
                     <g key={i}>
-                        {/* Vertical lines */}
-                        <line
-                            x1={pos}
-                            y1={0}
-                            x2={pos}
-                            y2={400}
-                            stroke={pos === 200 ? centerColor : gridColor}
-                            strokeWidth={pos === 200 ? 2 : 1}
-                        />
-                        {/* Horizontal lines */}
-                        <line
-                            x1={0}
-                            y1={pos}
-                            x2={400}
-                            y2={pos}
-                            stroke={pos === 200 ? centerColor : gridColor}
-                            strokeWidth={pos === 200 ? 2 : 1}
-                        />
+                        <line x1={pos} y1={0} x2={pos} y2={400} stroke={gridColor} strokeWidth={1} />
+                        <line x1={0} y1={pos} x2={400} y2={pos} stroke={gridColor} strokeWidth={1} />
                     </g>
                 );
             })}
-            
-            {/* Label sumbu X (di bawah, sejajar dengan garis tengah horizontal) */}
-            <text
-                x={380}
-                y={210}
-                fontSize="14"
-                fontWeight="bold"
-                fill={textColor}
-                textAnchor="end"
-                style={{ pointerEvents: 'none' }}
-            >
-                X →
+
+            {/* 2. Garis Sumbu X Utama (Horizontal di Y = 200) */}
+            <line
+                x1={0}
+                y1={200}
+                x2={394}
+                y2={200}
+                stroke={axisXColor}
+                strokeWidth={2}
+                markerEnd="url(#arrowX)"
+            />
+
+            {/* 3. Garis Sumbu Y Utama (Vertikal di X = 200) */}
+            <line
+                x1={200}
+                y1={400}
+                x2={200}
+                y2={6}
+                stroke={axisYColor}
+                strokeWidth={2}
+                markerEnd="url(#arrowY)"
+            />
+
+            {/* Label huruf X dan Y di ujung sumbu */}
+            <text x={385} y={190} fontSize="13" fontWeight="bold" fill={axisXColor} textAnchor="end">
+                X
             </text>
-            
-            {/* Label sumbu Y (di kiri, sejajar dengan garis tengah vertikal) */}
-            <text
-                x={190}
-                y={14}
-                fontSize="14"
-                fontWeight="bold"
-                fill={textColor}
-                textAnchor="end"
-                style={{ pointerEvents: 'none' }}
-            >
-                ↑ Y
+            <text x={212} y={18} fontSize="13" fontWeight="bold" fill={axisYColor} textAnchor="start">
+                Y
             </text>
-            
-            {/* Label angka pada sumbu X (bawah) */}
+
+            {/* 4. Titik & Angka Koordinat di sepanjang Garis Sumbu X & Y */}
             {Array.from({ length: 9 }, (_, i) => {
                 const pos = i * 50;
                 const value = pos - 200;
-                if (value !== 0) {
-                    return (
-                        <text
-                            key={`x-${i}`}
-                            x={pos}
-                            y={395}
-                            fontSize="10"
-                            fill={textColor}
-                            textAnchor="middle"
-                            style={{ pointerEvents: 'none' }}
-                        >
-                            {value}
-                        </text>
-                    );
-                }
-                return null;
+                const valueY = 200 - pos;
+                if (value === 0) return null;
+
+                return (
+                    <g key={`ticks-${i}`}>
+                        {/* Tick & Angka di Garis Sumbu X */}
+                        <line x1={pos} y1={196} x2={pos} y2={204} stroke={axisXColor} strokeWidth={1.5} />
+                        {pos > 15 && pos < 385 && (
+                            <text x={pos} y={215} fontSize="9" fill={textColor} textAnchor="middle">
+                                {value}
+                            </text>
+                        )}
+
+                        {/* Tick & Angka di Garis Sumbu Y */}
+                        <line x1={196} y1={pos} x2={204} y2={pos} stroke={axisYColor} strokeWidth={1.5} />
+                        {pos > 15 && pos < 385 && (
+                            <text x={192} y={pos + 3} fontSize="9" fill={textColor} textAnchor="end">
+                                {valueY}
+                            </text>
+                        )}
+                    </g>
+                );
             })}
-            
-            {/* Label angka pada sumbu Y (kiri) */}
-            {Array.from({ length: 9 }, (_, i) => {
-                const pos = i * 50;
-                const value = 200 - pos;
-                if (value !== 0) {
-                    return (
-                        <text
-                            key={`y-${i}`}
-                            x={5}
-                            y={pos + 4}
-                            fontSize="10"
-                            fill={textColor}
-                            textAnchor="start"
-                            style={{ pointerEvents: 'none' }}
-                        >
-                            {value}
-                        </text>
-                    );
-                }
-                return null;
-            })}
-            
-            {/* Label 0 di tengah */}
-            <text
-                x={200}
-                y={395}
-                fontSize="10"
-                fill={textColor}
-                textAnchor="middle"
-                style={{ pointerEvents: 'none' }}
-            >
-                0
-            </text>
-            <text
-                x={5}
-                y={204}
-                fontSize="10"
-                fill={textColor}
-                textAnchor="start"
-                style={{ pointerEvents: 'none' }}
-            >
+
+            {/* Titik Pusat (0,0) */}
+            <circle cx={200} cy={200} r={3} fill={textColor} />
+            <text x={192} y={213} fontSize="9" fontWeight="bold" fill={textColor} textAnchor="end">
                 0
             </text>
         </svg>
