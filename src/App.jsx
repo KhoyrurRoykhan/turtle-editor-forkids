@@ -133,10 +133,14 @@ const HalamanUtama = () => {
         return parsedLines.join('\n');
     };
 
-    const runit = (code, forceReset = false) => {
+    const runit = (code, forceReset = false, targetTheme = theme) => {
         setIsRunning(true);
         setOutput('');
-        const imports = "from turtle import *\nreset()\nshape('turtle')\nspeed(2)\n";
+        
+        // Tentukan warna kura-kura & garis berdasarkan tema
+        const defaultColor = targetTheme === 'dark' ? 'white' : 'black';
+        const imports = `from turtle import *\nreset()\nshape('turtle')\ncolor('${defaultColor}')\nspeed(2)\n`;
+        
         const parsedCode = parseSimpleCommands(pythonCode);
         const prog = forceReset ? imports : imports + parsedCode;
 
@@ -161,12 +165,14 @@ const HalamanUtama = () => {
     const resetCode = () => {
         setPythonCode('');
         setOutput('');
-        runit('', true);
+        runit('', true, theme);
     };
 
+    // Otomatis gambar ulang kura-kura & garis saat tema berubah (Terang <-> Gelap)
     useEffect(() => {
-        runit('', true);
-    }, []);
+        runit(pythonCode, pythonCode.trim() === '', theme);
+    }, [theme]);
+
 
     const handleOpenFile = (event) => {
         const file = event.target.files[0];
@@ -220,44 +226,44 @@ const HalamanUtama = () => {
             backgroundColor: currentTheme.background,
             transition: 'all 0.3s ease'
         }}>
-<Navbar expand="lg" style={{
-    backgroundColor: '#1e5631',
-    borderBottom: 'none',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-}}>
-    <Container fluid>
-        <Navbar.Brand as={Link} to="/" style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '1.5rem' }}>
-            <FaCode /> Turtle Geometry
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ backgroundColor: '#ffffff33', border: 'none' }} />
-        <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
-            <Nav className="align-items-center gap-3">
-                <Nav.Link as={Link} to="/" style={{ color: '#ffffff', fontWeight: '500' }}>
-                    Halaman Utama
-                </Nav.Link>
-                <Nav.Link as={Link} to="/halaman-baru" style={{ color: '#ffffff', fontWeight: '500' }}>
-                    Halaman Baru
-                </Nav.Link>
-                <Button
-                    variant="light"
-                    onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        backgroundColor: '#ffffff',
-                        color: '#1e5631',
-                        border: 'none',
-                        fontWeight: '500'
-                    }}
-                >
-                    {theme === 'light' ? <BsMoon /> : <BsSun />}
-                    {theme === 'light' ? 'Mode Gelap' : 'Mode Terang'}
-                </Button>
-            </Nav>
-        </Navbar.Collapse>
-    </Container>
-</Navbar>
+            <Navbar expand="lg" style={{
+                backgroundColor: '#1e5631',
+                borderBottom: 'none',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            }}>
+                <Container fluid>
+                    <Navbar.Brand as={Link} to="/" style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '1.5rem' }}>
+                        <FaCode /> BidGeometry
+                    </Navbar.Brand>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ backgroundColor: '#ffffff33', border: 'none' }} />
+                    <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
+                        <Nav className="align-items-center gap-3">
+                            <Nav.Link as={Link} to="/" style={{ color: '#ffffff', fontWeight: '500' }}>
+                                Halaman Utama
+                            </Nav.Link>
+                            <Nav.Link as={Link} to="/halaman-baru" style={{ color: '#ffffff', fontWeight: '500' }}>
+                                Halaman Baru
+                            </Nav.Link>
+                            <Button
+                                variant="light"
+                                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    backgroundColor: '#ffffff',
+                                    color: '#1e5631',
+                                    border: 'none',
+                                    fontWeight: '500'
+                                }}
+                            >
+                                {theme === 'light' ? <BsMoon /> : <BsSun />}
+                                {theme === 'light' ? 'Mode Gelap' : 'Mode Terang'}
+                            </Button>
+                        </Nav>
+                    </Navbar.Collapse>
+                </Container>
+            </Navbar>
 
             <Container fluid style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
                 <div style={{
@@ -376,40 +382,18 @@ const HalamanUtama = () => {
                         }}>
                             Canvas:
                         </div>
-                        <div style={{
-                            position: 'relative',
-                            width: '400px',
-                            height: '400px'
-                        }}>
-                            {/* Canvas untuk turtle */}
-                            <div
-                                id="mycanvas"
-                                style={{
-                                    width: '400px',
-                                    height: '400px',
-                                    background: theme === 'light' ? '#ffffff' : '#1a1a2e',
-                                    borderRadius: '0px',
-                                    border: `2px solid ${currentTheme.canvasBorder}`,
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    zIndex: 1
-                                }}
-                            />
-                            {/* Grid overlay - selalu di atas canvas */}
-                            <div style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
+                        {/* Canvas kosong tanpa grid */}
+                        <div
+                            id="mycanvas"
+                            style={{
                                 width: '400px',
                                 height: '400px',
-                                pointerEvents: 'none',
-                                zIndex: 2
-                            }}>
-                                <CanvasGrid theme={theme} />
-                            </div>
-                        </div>
+                                background: theme === 'light' ? '#ffffff' : '#1a1a2e',
+                                borderRadius: '0px',
+                                border: `2px solid ${currentTheme.canvasBorder}`,
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                            }}
+                        />
                     </div>
                 </div>
             </Container>
@@ -454,144 +438,6 @@ const HalamanUtama = () => {
                 </Modal.Footer>
             </Modal>
         </div>
-    );
-};
-
-const CanvasGrid = ({ theme }) => {
-    const gridColor = theme === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)';
-    const centerColor = theme === 'light' ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)';
-    const textColor = theme === 'light' ? '#666' : '#999';
-    
-    return (
-        <svg
-            width="400"
-            height="400"
-            style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                pointerEvents: 'none'
-            }}
-        >
-            {/* Grid lines setiap 50px */}
-            {Array.from({ length: 9 }, (_, i) => {
-                const pos = i * 50;
-                return (
-                    <g key={i}>
-                        {/* Vertical lines */}
-                        <line
-                            x1={pos}
-                            y1={0}
-                            x2={pos}
-                            y2={400}
-                            stroke={pos === 200 ? centerColor : gridColor}
-                            strokeWidth={pos === 200 ? 2 : 1}
-                        />
-                        {/* Horizontal lines */}
-                        <line
-                            x1={0}
-                            y1={pos}
-                            x2={400}
-                            y2={pos}
-                            stroke={pos === 200 ? centerColor : gridColor}
-                            strokeWidth={pos === 200 ? 2 : 1}
-                        />
-                    </g>
-                );
-            })}
-            
-            {/* Label sumbu X (di bawah, sejajar dengan garis tengah horizontal) */}
-            <text
-                x={380}
-                y={210}
-                fontSize="14"
-                fontWeight="bold"
-                fill={textColor}
-                textAnchor="end"
-                style={{ pointerEvents: 'none' }}
-            >
-                X →
-            </text>
-            
-            {/* Label sumbu Y (di kiri, sejajar dengan garis tengah vertikal) */}
-            <text
-                x={190}
-                y={14}
-                fontSize="14"
-                fontWeight="bold"
-                fill={textColor}
-                textAnchor="end"
-                style={{ pointerEvents: 'none' }}
-            >
-                ↑ Y
-            </text>
-            
-            {/* Label angka pada sumbu X (bawah) */}
-            {Array.from({ length: 9 }, (_, i) => {
-                const pos = i * 50;
-                const value = pos - 200;
-                if (value !== 0) {
-                    return (
-                        <text
-                            key={`x-${i}`}
-                            x={pos}
-                            y={395}
-                            fontSize="10"
-                            fill={textColor}
-                            textAnchor="middle"
-                            style={{ pointerEvents: 'none' }}
-                        >
-                            {value}
-                        </text>
-                    );
-                }
-                return null;
-            })}
-            
-            {/* Label angka pada sumbu Y (kiri) */}
-            {Array.from({ length: 9 }, (_, i) => {
-                const pos = i * 50;
-                const value = 200 - pos;
-                if (value !== 0) {
-                    return (
-                        <text
-                            key={`y-${i}`}
-                            x={5}
-                            y={pos + 4}
-                            fontSize="10"
-                            fill={textColor}
-                            textAnchor="start"
-                            style={{ pointerEvents: 'none' }}
-                        >
-                            {value}
-                        </text>
-                    );
-                }
-                return null;
-            })}
-            
-            {/* Label 0 di tengah */}
-            <text
-                x={200}
-                y={395}
-                fontSize="10"
-                fill={textColor}
-                textAnchor="middle"
-                style={{ pointerEvents: 'none' }}
-            >
-                0
-            </text>
-            <text
-                x={5}
-                y={204}
-                fontSize="10"
-                fill={textColor}
-                textAnchor="start"
-                style={{ pointerEvents: 'none' }}
-            >
-                0
-            </text>
-        </svg>
     );
 };
 
