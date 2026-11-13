@@ -245,22 +245,50 @@ const HalamanBaru = () => {
                             <Nav.Link as={Link} to="/halaman-baru" style={{ color: '#ffffff', fontWeight: '500' }}>
                                 Halaman Baru
                             </Nav.Link>
-                            <Button
-                                variant="light"
+
+                            {/* Toggle Switch On/Off Mode Gelap */}
+                            <div
                                 onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                                role="switch"
+                                aria-checked={theme === 'dark'}
                                 style={{
-                                    display: 'flex',
+                                    display: 'inline-flex',
                                     alignItems: 'center',
-                                    gap: '8px',
-                                    backgroundColor: '#ffffff',
-                                    color: '#1e5631',
-                                    border: 'none',
-                                    fontWeight: '500'
+                                    gap: '10px',
+                                    cursor: 'pointer',
+                                    userSelect: 'none',
+                                    padding: '5px 12px',
+                                    borderRadius: '30px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.14)'
                                 }}
                             >
-                                {theme === 'light' ? <BsMoon /> : <BsSun />}
-                                {theme === 'light' ? 'Mode Gelap' : 'Mode Terang'}
-                            </Button>
+                                <span style={{ color: '#ffffff', fontSize: '0.88rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    {theme === 'light' ? <BsSun /> : <BsMoon />}
+                                    {theme === 'dark' ? 'Gelap' : 'Terang'}
+                                </span>
+
+                                <div style={{
+                                    width: '46px',
+                                    height: '24px',
+                                    backgroundColor: theme === 'dark' ? '#4f46e5' : '#cbd5e1',
+                                    borderRadius: '999px',
+                                    padding: '2px',
+                                    transition: 'background-color 0.25s ease',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.2)'
+                                }}>
+                                    <div style={{
+                                        width: '20px',
+                                        height: '20px',
+                                        backgroundColor: '#ffffff',
+                                        borderRadius: '50%',
+                                        transform: theme === 'dark' ? 'translateX(22px)' : 'translateX(0px)',
+                                        transition: 'transform 0.25s ease',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.25)'
+                                    }} />
+                                </div>
+                            </div>
                         </Nav>
                     </Navbar.Collapse>
                 </Container>
