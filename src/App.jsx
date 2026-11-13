@@ -3,7 +3,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
 import { dracula } from '@uiw/codemirror-theme-dracula';
 import { Button, Modal, Form, Navbar, Nav, Container } from 'react-bootstrap';
-import { BsArrowClockwise, BsPlayFill, BsFolder2Open, BsDownload, BsSave2, BsMoon, BsSun } from 'react-icons/bs';
+import { BsArrowClockwise, BsPlayFill, BsFolder2Open, BsDownload, BsSave2, BsMoon, BsSun, BsGrid3X3 } from 'react-icons/bs';
 import { FaCode } from 'react-icons/fa';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import HalamanBaru from './HalamanBaru';
@@ -15,6 +15,7 @@ const HalamanUtama = () => {
     const [showSaveModal, setShowSaveModal] = useState(false);
     const [theme, setTheme] = useState('light');
     const [isRunning, setIsRunning] = useState(false);
+    const [showGrid, setShowGrid] = useState(false); // State On/Off sistem Kartesius (default: mati/kosong)
     const fileInputRef = useRef(null);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 992);
 
@@ -137,7 +138,6 @@ const HalamanUtama = () => {
         setIsRunning(true);
         setOutput('');
 
-        // Tentukan warna kura-kura & garis berdasarkan tema
         const defaultColor = targetTheme === 'dark' ? 'white' : 'black';
         const imports = `from turtle import *\nreset()\nshape('turtle')\ncolor('${defaultColor}')\nspeed(2)\n`;
 
@@ -147,7 +147,6 @@ const HalamanUtama = () => {
         window.Sk.pre = "output";
         window.Sk.configure({ output: outf, read: builtinRead });
 
-        // Atur dimensi internal Skulpt TurtleGraphics menjadi 600x400
         window.Sk.TurtleGraphics = window.Sk.TurtleGraphics || {};
         window.Sk.TurtleGraphics.target = 'mycanvas';
         window.Sk.TurtleGraphics.width = 600;
@@ -173,7 +172,6 @@ const HalamanUtama = () => {
         runit('', true, theme);
     };
 
-    // Otomatis gambar ulang kura-kura & garis saat tema berubah (Terang <-> Gelap)
     useEffect(() => {
         runit(pythonCode, pythonCode.trim() === '', theme);
     }, [theme]);
@@ -242,28 +240,56 @@ const HalamanUtama = () => {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ backgroundColor: '#ffffff33', border: 'none' }} />
                     <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                         <Nav className="align-items-center gap-3">
-                            <Nav.Link as={Link} to="/" style={{ color: '#ffffff', fontWeight: '500' }}>
+                            {/* <Nav.Link as={Link} to="/" style={{ color: '#ffffff', fontWeight: '500' }}>
                                 Halaman Utama
                             </Nav.Link>
                             <Nav.Link as={Link} to="/halaman-baru" style={{ color: '#ffffff', fontWeight: '500' }}>
                                 Halaman Baru
-                            </Nav.Link>
-                            <Button
-                                variant="light"
+                            </Nav.Link> */}
+
+                            {/* Toggle Switch On/Off Mode Gelap */}
+                            <div
                                 onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                                role="switch"
+                                aria-checked={theme === 'dark'}
                                 style={{
-                                    display: 'flex',
+                                    display: 'inline-flex',
                                     alignItems: 'center',
-                                    gap: '8px',
-                                    backgroundColor: '#ffffff',
-                                    color: '#1e5631',
-                                    border: 'none',
-                                    fontWeight: '500'
+                                    gap: '10px',
+                                    cursor: 'pointer',
+                                    userSelect: 'none',
+                                    padding: '5px 12px',
+                                    borderRadius: '30px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.14)'
                                 }}
                             >
-                                {theme === 'light' ? <BsMoon /> : <BsSun />}
-                                {theme === 'light' ? 'Mode Gelap' : 'Mode Terang'}
-                            </Button>
+                                <span style={{ color: '#ffffff', fontSize: '0.88rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    {theme === 'light' ? <BsSun /> : <BsMoon />}
+                                    {theme === 'dark' ? 'Gelap' : 'Terang'}
+                                </span>
+
+                                <div style={{
+                                    width: '46px',
+                                    height: '24px',
+                                    backgroundColor: theme === 'dark' ? '#4f46e5' : '#cbd5e1',
+                                    borderRadius: '999px',
+                                    padding: '2px',
+                                    transition: 'background-color 0.25s ease',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.2)'
+                                }}>
+                                    <div style={{
+                                        width: '20px',
+                                        height: '20px',
+                                        backgroundColor: '#ffffff',
+                                        borderRadius: '50%',
+                                        transform: theme === 'dark' ? 'translateX(22px)' : 'translateX(0px)',
+                                        transition: 'transform 0.25s ease',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.25)'
+                                    }} />
+                                </div>
+                            </div>
                         </Nav>
                     </Navbar.Collapse>
                 </Container>
@@ -370,7 +396,7 @@ const HalamanUtama = () => {
                         </div>
                     </div>
 
-                    {/* Bagian Kanan: Canvas 600px x 400px (kosong tanpa grid) */}
+                    {/* Bagian Kanan: Canvas 600px x 400px dengan Toggle Switch Kartesius On/Off */}
                     <div style={{
                         background: currentTheme.surface,
                         borderRadius: '20px',
@@ -383,26 +409,111 @@ const HalamanUtama = () => {
                         justifyContent: 'center',
                         overflowX: 'auto'
                     }}>
+                        {/* Header Canvas + Toggle Switch Kartesius On/Off */}
                         <div style={{
-                            fontWeight: '500',
-                            marginBottom: '0.75rem',
-                            color: currentTheme.text,
-                            alignSelf: 'flex-start'
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            width: '100%',
+                            marginBottom: '0.75rem'
                         }}>
-                            Canvas:
+                            <span style={{
+                                fontWeight: '500',
+                                color: currentTheme.text
+                            }}>
+                                Canvas:
+                            </span>
+
+                            {/* Toggle Switch On/Off Kartesius */}
+                            <div
+                                onClick={() => setShowGrid(!showGrid)}
+                                role="switch"
+                                aria-checked={showGrid}
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '10px',
+                                    cursor: 'pointer',
+                                    userSelect: 'none',
+                                    padding: '4px 10px',
+                                    borderRadius: '30px',
+                                    backgroundColor: theme === 'light' ? '#f1f3f5' : '#1a1a2e',
+                                    border: `1px solid ${currentTheme.border}`
+                                }}
+                            >
+                                <span style={{
+                                    color: currentTheme.text,
+                                    fontSize: '0.84rem',
+                                    fontWeight: '500',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px'
+                                }}>
+                                    <BsGrid3X3 />
+                                    Kartesius
+                                </span>
+
+                                <div style={{
+                                    width: '44px',
+                                    height: '22px',
+                                    backgroundColor: showGrid ? '#1e5631' : '#cbd5e1',
+                                    borderRadius: '999px',
+                                    padding: '2px',
+                                    transition: 'background-color 0.25s ease',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.2)'
+                                }}>
+                                    <div style={{
+                                        width: '18px',
+                                        height: '18px',
+                                        backgroundColor: '#ffffff',
+                                        borderRadius: '50%',
+                                        transform: showGrid ? 'translateX(22px)' : 'translateX(0px)',
+                                        transition: 'transform 0.25s ease',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.25)'
+                                    }} />
+                                </div>
+                            </div>
                         </div>
-                        <div
-                            id="mycanvas"
-                            style={{
-                                width: '600px',
-                                height: '400px',
-                                background: theme === 'light' ? '#ffffff' : '#1a1a2e',
-                                borderRadius: '0px',
-                                border: `2px solid ${currentTheme.canvasBorder}`,
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                flexShrink: 0
-                            }}
-                        />
+
+                        <div style={{
+                            position: 'relative',
+                            width: '600px',
+                            height: '400px',
+                            flexShrink: 0
+                        }}>
+                            {/* Canvas untuk turtle */}
+                            <div
+                                id="mycanvas"
+                                style={{
+                                    width: '600px',
+                                    height: '400px',
+                                    background: theme === 'light' ? '#ffffff' : '#1a1a2e',
+                                    borderRadius: '0px',
+                                    border: `2px solid ${currentTheme.canvasBorder}`,
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    zIndex: 1
+                                }}
+                            />
+                            {/* Grid Kartesius muncul hanya jika showGrid === true */}
+                            {showGrid && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '600px',
+                                    height: '400px',
+                                    pointerEvents: 'none',
+                                    zIndex: 2
+                                }}>
+                                    <CanvasGrid theme={theme} />
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </Container>
@@ -447,6 +558,119 @@ const HalamanUtama = () => {
                 </Modal.Footer>
             </Modal>
         </div>
+    );
+};
+
+const CanvasGrid = ({ theme }) => {
+    const gridColor = theme === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.12)';
+    const centerColor = theme === 'light' ? 'rgba(0,0,0,0.28)' : 'rgba(255,255,255,0.45)';
+    const textColor = theme === 'light' ? '#555' : '#e0e0e0';
+
+    return (
+        <svg
+            width="600"
+            height="400"
+            style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                pointerEvents: 'none'
+            }}
+        >
+            {/* Garis Vertikal setiap 50px (0 sampai 600 -> tengah di X = 300) */}
+            {Array.from({ length: 13 }, (_, i) => {
+                const pos = i * 50;
+                const value = pos - 300;
+                return (
+                    <g key={`v-${i}`}>
+                        <line
+                            x1={pos}
+                            y1={0}
+                            x2={pos}
+                            y2={400}
+                            stroke={pos === 300 ? centerColor : gridColor}
+                            strokeWidth={pos === 300 ? 2 : 1}
+                        />
+                        {value !== 0 && pos > 0 && pos < 600 && (
+                            <text
+                                x={pos}
+                                y={395}
+                                fontSize="10"
+                                fill={textColor}
+                                textAnchor="middle"
+                                style={{ pointerEvents: 'none' }}
+                            >
+                                {value}
+                            </text>
+                        )}
+                    </g>
+                );
+            })}
+
+            {/* Garis Horizontal setiap 50px (0 sampai 400 -> tengah di Y = 200) */}
+            {Array.from({ length: 9 }, (_, i) => {
+                const pos = i * 50;
+                const value = 200 - pos;
+                return (
+                    <g key={`h-${i}`}>
+                        <line
+                            x1={0}
+                            y1={pos}
+                            x2={600}
+                            y2={pos}
+                            stroke={pos === 200 ? centerColor : gridColor}
+                            strokeWidth={pos === 200 ? 2 : 1}
+                        />
+                        {value !== 0 && pos > 0 && pos < 400 && (
+                            <text
+                                x={5}
+                                y={pos + 4}
+                                fontSize="10"
+                                fill={textColor}
+                                textAnchor="start"
+                                style={{ pointerEvents: 'none' }}
+                            >
+                                {value}
+                            </text>
+                        )}
+                    </g>
+                );
+            })}
+
+            {/* Label sumbu X */}
+            <text
+                x={585}
+                y={214}
+                fontSize="14"
+                fontWeight="bold"
+                fill={textColor}
+                textAnchor="end"
+                style={{ pointerEvents: 'none' }}
+            >
+                X →
+            </text>
+
+            {/* Label sumbu Y */}
+            <text
+                x={290}
+                y={16}
+                fontSize="14"
+                fontWeight="bold"
+                fill={textColor}
+                textAnchor="end"
+                style={{ pointerEvents: 'none' }}
+            >
+                ↑ Y
+            </text>
+
+            {/* Label 0 */}
+            <text x={300} y={395} fontSize="10" fill={textColor} textAnchor="middle">
+                0
+            </text>
+            <text x={5} y={204} fontSize="10" fill={textColor} textAnchor="start">
+                0
+            </text>
+        </svg>
     );
 };
 
