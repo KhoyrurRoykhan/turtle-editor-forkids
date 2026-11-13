@@ -5,7 +5,6 @@ import { dracula } from '@uiw/codemirror-theme-dracula';
 import { Button, Modal, Form, Navbar, Nav, Container } from 'react-bootstrap';
 import { BsArrowClockwise, BsPlayFill, BsFolder2Open, BsDownload, BsSave2, BsMoon, BsSun } from 'react-icons/bs';
 import { FaCode } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import HalamanBaru from './HalamanBaru';
 
