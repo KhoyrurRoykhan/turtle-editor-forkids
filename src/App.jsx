@@ -16,11 +16,11 @@ const HalamanUtama = () => {
     const [theme, setTheme] = useState('light');
     const [isRunning, setIsRunning] = useState(false);
     const fileInputRef = useRef(null);
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 992);
 
     useEffect(() => {
         const handleResize = () => {
-            setIsMobile(window.innerWidth <= 768);
+            setIsMobile(window.innerWidth <= 992);
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -136,17 +136,22 @@ const HalamanUtama = () => {
     const runit = (code, forceReset = false, targetTheme = theme) => {
         setIsRunning(true);
         setOutput('');
-        
+
         // Tentukan warna kura-kura & garis berdasarkan tema
         const defaultColor = targetTheme === 'dark' ? 'white' : 'black';
         const imports = `from turtle import *\nreset()\nshape('turtle')\ncolor('${defaultColor}')\nspeed(2)\n`;
-        
+
         const parsedCode = parseSimpleCommands(pythonCode);
         const prog = forceReset ? imports : imports + parsedCode;
 
         window.Sk.pre = "output";
         window.Sk.configure({ output: outf, read: builtinRead });
-        (window.Sk.TurtleGraphics || (window.Sk.TurtleGraphics = {})).target = 'mycanvas';
+
+        // Atur dimensi internal Skulpt TurtleGraphics menjadi 600x400
+        window.Sk.TurtleGraphics = window.Sk.TurtleGraphics || {};
+        window.Sk.TurtleGraphics.target = 'mycanvas';
+        window.Sk.TurtleGraphics.width = 600;
+        window.Sk.TurtleGraphics.height = 400;
 
         window.Sk.misceval.asyncToPromise(() =>
             window.Sk.importMainWithBody('<stdin>', false, prog, true)
@@ -172,7 +177,6 @@ const HalamanUtama = () => {
     useEffect(() => {
         runit(pythonCode, pythonCode.trim() === '', theme);
     }, [theme]);
-
 
     const handleOpenFile = (event) => {
         const file = event.target.files[0];
@@ -265,32 +269,35 @@ const HalamanUtama = () => {
                 </Container>
             </Navbar>
 
-            <Container fluid style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+            <Container fluid style={{ padding: '1.75rem', maxWidth: '1400px', margin: '0 auto' }}>
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: isMobile ? '1fr' : '1fr 440px',
+                    gridTemplateColumns: isMobile ? '1fr' : '1fr 635px',
                     gap: '1.5rem',
                     alignItems: 'start'
                 }}>
+                    {/* Bagian Kiri: Text Editor */}
                     <div style={{
                         background: currentTheme.surface,
                         borderRadius: '20px',
-                        padding: '1.25rem',
+                        padding: '1.1rem',
                         boxShadow: '0 8px 20px rgba(0,0,0,0.05)',
-                        border: `1px solid ${currentTheme.border}`
+                        border: `1px solid ${currentTheme.border}`,
+                        minWidth: '300px'
                     }}>
-                        <div style={{ marginBottom: '1rem' }}>
+                        <div style={{ marginBottom: '0.9rem' }}>
                             <CodeMirror
                                 placeholder="# Tulis kode Python turtle di sini..."
                                 value={pythonCode}
-                                height="400px"
+                                height="340px"
                                 theme={theme === 'dark' ? dracula : 'light'}
                                 extensions={[python()]}
                                 onChange={(value) => setPythonCode(value)}
                                 style={{
                                     borderRadius: '12px',
                                     overflow: 'hidden',
-                                    border: `1px solid ${currentTheme.border}`
+                                    border: `1px solid ${currentTheme.border}`,
+                                    fontSize: '0.9rem'
                                 }}
                             />
                         </div>
@@ -298,8 +305,8 @@ const HalamanUtama = () => {
                         <div style={{
                             display: 'flex',
                             flexWrap: 'wrap',
-                            gap: '0.75rem',
-                            marginBottom: '1.5rem'
+                            gap: '0.6rem',
+                            marginBottom: '1.1rem'
                         }}>
                             <ActionButton
                                 onClick={() => runit()}
@@ -337,9 +344,9 @@ const HalamanUtama = () => {
 
                         <div>
                             <div style={{
-                                fontSize: '0.85rem',
+                                fontSize: '0.82rem',
                                 fontWeight: '500',
-                                marginBottom: '0.5rem',
+                                marginBottom: '0.4rem',
                                 color: currentTheme.text,
                                 letterSpacing: '0.5px'
                             }}>
@@ -348,12 +355,12 @@ const HalamanUtama = () => {
                             <pre style={{
                                 background: currentTheme.outputBg,
                                 color: currentTheme.outputText,
-                                padding: '0.75rem',
+                                padding: '0.65rem',
                                 borderRadius: '12px',
                                 fontFamily: 'monospace',
-                                fontSize: '0.9rem',
-                                minHeight: '80px',
-                                maxHeight: '150px',
+                                fontSize: '0.85rem',
+                                minHeight: '65px',
+                                maxHeight: '110px',
                                 overflow: 'auto',
                                 border: `1px solid ${currentTheme.border}`,
                                 margin: 0
@@ -363,6 +370,7 @@ const HalamanUtama = () => {
                         </div>
                     </div>
 
+                    {/* Bagian Kanan: Canvas 600px x 400px (kosong tanpa grid) */}
                     <div style={{
                         background: currentTheme.surface,
                         borderRadius: '20px',
@@ -372,7 +380,8 @@ const HalamanUtama = () => {
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        overflowX: 'auto'
                     }}>
                         <div style={{
                             fontWeight: '500',
@@ -382,16 +391,16 @@ const HalamanUtama = () => {
                         }}>
                             Canvas:
                         </div>
-                        {/* Canvas kosong tanpa grid */}
                         <div
                             id="mycanvas"
                             style={{
-                                width: '400px',
+                                width: '600px',
                                 height: '400px',
                                 background: theme === 'light' ? '#ffffff' : '#1a1a2e',
                                 borderRadius: '0px',
                                 border: `2px solid ${currentTheme.canvasBorder}`,
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                flexShrink: 0
                             }}
                         />
                     </div>
@@ -472,11 +481,11 @@ const ActionButton = ({ onClick, icon, label, variant, disabled }) => {
             style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '8px 18px',
+                gap: '6px',
+                padding: '7px 15px',
                 borderRadius: '40px',
                 fontWeight: '500',
-                fontSize: '0.9rem',
+                fontSize: '0.88rem',
                 cursor: disabled ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s ease',
                 opacity: disabled ? 0.6 : 1,

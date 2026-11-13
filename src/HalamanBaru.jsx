@@ -15,11 +15,11 @@ const HalamanBaru = () => {
     const [theme, setTheme] = useState('light');
     const [isRunning, setIsRunning] = useState(false);
     const fileInputRef = useRef(null);
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 992);
 
     useEffect(() => {
         const handleResize = () => {
-            setIsMobile(window.innerWidth <= 768);
+            setIsMobile(window.innerWidth <= 992);
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -132,20 +132,24 @@ const HalamanBaru = () => {
         return parsedLines.join('\n');
     };
 
-const runit = (code, forceReset = false, targetTheme = theme) => {
+    const runit = (code, forceReset = false, targetTheme = theme) => {
         setIsRunning(true);
         setOutput('');
-        
-        // Tentukan warna kura-kura & garis berdasarkan tema
+
         const defaultColor = targetTheme === 'dark' ? 'white' : 'black';
         const imports = `from turtle import *\nreset()\nshape('turtle')\ncolor('${defaultColor}')\nspeed(2)\n`;
-        
+
         const parsedCode = parseSimpleCommands(pythonCode);
         const prog = forceReset ? imports : imports + parsedCode;
 
         window.Sk.pre = "output";
         window.Sk.configure({ output: outf, read: builtinRead });
-        (window.Sk.TurtleGraphics || (window.Sk.TurtleGraphics = {})).target = 'mycanvas';
+
+        // Atur dimensi internal Skulpt TurtleGraphics menjadi 600x400
+        window.Sk.TurtleGraphics = window.Sk.TurtleGraphics || {};
+        window.Sk.TurtleGraphics.target = 'mycanvas';
+        window.Sk.TurtleGraphics.width = 600;
+        window.Sk.TurtleGraphics.height = 400;
 
         window.Sk.misceval.asyncToPromise(() =>
             window.Sk.importMainWithBody('<stdin>', false, prog, true)
@@ -167,7 +171,6 @@ const runit = (code, forceReset = false, targetTheme = theme) => {
         runit('', true, theme);
     };
 
-    // Otomatis gambar ulang kura-kura & garis saat tema berubah (Terang <-> Gelap)
     useEffect(() => {
         runit(pythonCode, pythonCode.trim() === '', theme);
     }, [theme]);
@@ -263,32 +266,36 @@ const runit = (code, forceReset = false, targetTheme = theme) => {
                 </Container>
             </Navbar>
 
-            <Container fluid style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+            <Container fluid style={{ padding: '1.75rem', maxWidth: '1400px', margin: '0 auto' }}>
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: isMobile ? '1fr' : '1fr 440px',
+                    // Kolom kiri (Text Editor) disesuaikan dengan sisa ruang, kolom kanan (Canvas) 635px
+                    gridTemplateColumns: isMobile ? '1fr' : '1fr 635px',
                     gap: '1.5rem',
                     alignItems: 'start'
                 }}>
+                    {/* Bagian Kiri: Text Editor */}
                     <div style={{
                         background: currentTheme.surface,
                         borderRadius: '20px',
-                        padding: '1.25rem',
+                        padding: '1.1rem',
                         boxShadow: '0 8px 20px rgba(0,0,0,0.05)',
-                        border: `1px solid ${currentTheme.border}`
+                        border: `1px solid ${currentTheme.border}`,
+                        minWidth: '300px'
                     }}>
-                        <div style={{ marginBottom: '1rem' }}>
+                        <div style={{ marginBottom: '0.9rem' }}>
                             <CodeMirror
                                 placeholder="# Tulis kode Python turtle di sini..."
                                 value={pythonCode}
-                                height="400px"
+                                height="340px"
                                 theme={theme === 'dark' ? dracula : 'light'}
                                 extensions={[python()]}
                                 onChange={(value) => setPythonCode(value)}
                                 style={{
                                     borderRadius: '12px',
                                     overflow: 'hidden',
-                                    border: `1px solid ${currentTheme.border}`
+                                    border: `1px solid ${currentTheme.border}`,
+                                    fontSize: '0.9rem'
                                 }}
                             />
                         </div>
@@ -296,8 +303,8 @@ const runit = (code, forceReset = false, targetTheme = theme) => {
                         <div style={{
                             display: 'flex',
                             flexWrap: 'wrap',
-                            gap: '0.75rem',
-                            marginBottom: '1.5rem'
+                            gap: '0.6rem',
+                            marginBottom: '1.1rem'
                         }}>
                             <ActionButton
                                 onClick={() => runit()}
@@ -335,9 +342,9 @@ const runit = (code, forceReset = false, targetTheme = theme) => {
 
                         <div>
                             <div style={{
-                                fontSize: '0.85rem',
+                                fontSize: '0.82rem',
                                 fontWeight: '500',
-                                marginBottom: '0.5rem',
+                                marginBottom: '0.4rem',
                                 color: currentTheme.text,
                                 letterSpacing: '0.5px'
                             }}>
@@ -346,12 +353,12 @@ const runit = (code, forceReset = false, targetTheme = theme) => {
                             <pre style={{
                                 background: currentTheme.outputBg,
                                 color: currentTheme.outputText,
-                                padding: '0.75rem',
+                                padding: '0.65rem',
                                 borderRadius: '12px',
                                 fontFamily: 'monospace',
-                                fontSize: '0.9rem',
-                                minHeight: '80px',
-                                maxHeight: '150px',
+                                fontSize: '0.85rem',
+                                minHeight: '65px',
+                                maxHeight: '110px',
                                 overflow: 'auto',
                                 border: `1px solid ${currentTheme.border}`,
                                 margin: 0
@@ -361,6 +368,7 @@ const runit = (code, forceReset = false, targetTheme = theme) => {
                         </div>
                     </div>
 
+                    {/* Bagian Kanan: Canvas 600px x 400px */}
                     <div style={{
                         background: currentTheme.surface,
                         borderRadius: '20px',
@@ -370,7 +378,8 @@ const runit = (code, forceReset = false, targetTheme = theme) => {
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        overflowX: 'auto'
                     }}>
                         <div style={{
                             fontWeight: '500',
@@ -382,14 +391,15 @@ const runit = (code, forceReset = false, targetTheme = theme) => {
                         </div>
                         <div style={{
                             position: 'relative',
-                            width: '400px',
-                            height: '400px'
+                            width: '600px',
+                            height: '400px',
+                            flexShrink: 0
                         }}>
                             {/* Canvas untuk turtle */}
                             <div
                                 id="mycanvas"
                                 style={{
-                                    width: '400px',
+                                    width: '600px',
                                     height: '400px',
                                     background: theme === 'light' ? '#ffffff' : '#1a1a2e',
                                     borderRadius: '0px',
@@ -401,12 +411,12 @@ const runit = (code, forceReset = false, targetTheme = theme) => {
                                     zIndex: 1
                                 }}
                             />
-                            {/* Grid overlay - selalu di atas canvas */}
+                            {/* Grid overlay 600x400 - selalu di atas canvas */}
                             <div style={{
                                 position: 'absolute',
                                 top: 0,
                                 left: 0,
-                                width: '400px',
+                                width: '600px',
                                 height: '400px',
                                 pointerEvents: 'none',
                                 zIndex: 2
@@ -463,12 +473,12 @@ const runit = (code, forceReset = false, targetTheme = theme) => {
 
 const CanvasGrid = ({ theme }) => {
     const gridColor = theme === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.12)';
-    const centerColor = theme === 'light' ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.45)';
+    const centerColor = theme === 'light' ? 'rgba(0,0,0,0.28)' : 'rgba(255,255,255,0.45)';
     const textColor = theme === 'light' ? '#555' : '#e0e0e0';
-    
+
     return (
         <svg
-            width="400"
+            width="600"
             height="400"
             style={{
                 position: 'absolute',
@@ -477,37 +487,70 @@ const CanvasGrid = ({ theme }) => {
                 pointerEvents: 'none'
             }}
         >
-            {/* Grid lines setiap 50px */}
-            {Array.from({ length: 9 }, (_, i) => {
+            {/* Garis Vertikal setiap 50px (0 sampai 600 -> 13 garis, tengah di X = 300) */}
+            {Array.from({ length: 13 }, (_, i) => {
                 const pos = i * 50;
+                const value = pos - 300;
                 return (
-                    <g key={i}>
-                        {/* Vertical lines */}
+                    <g key={`v-${i}`}>
                         <line
                             x1={pos}
                             y1={0}
                             x2={pos}
                             y2={400}
-                            stroke={pos === 200 ? centerColor : gridColor}
-                            strokeWidth={pos === 200 ? 2 : 1}
+                            stroke={pos === 300 ? centerColor : gridColor}
+                            strokeWidth={pos === 300 ? 2 : 1}
                         />
-                        {/* Horizontal lines */}
+                        {value !== 0 && pos > 0 && pos < 600 && (
+                            <text
+                                x={pos}
+                                y={395}
+                                fontSize="10"
+                                fill={textColor}
+                                textAnchor="middle"
+                                style={{ pointerEvents: 'none' }}
+                            >
+                                {value}
+                            </text>
+                        )}
+                    </g>
+                );
+            })}
+
+            {/* Garis Horizontal setiap 50px (0 sampai 400 -> 9 garis, tengah di Y = 200) */}
+            {Array.from({ length: 9 }, (_, i) => {
+                const pos = i * 50;
+                const value = 200 - pos;
+                return (
+                    <g key={`h-${i}`}>
                         <line
                             x1={0}
                             y1={pos}
-                            x2={400}
+                            x2={600}
                             y2={pos}
                             stroke={pos === 200 ? centerColor : gridColor}
                             strokeWidth={pos === 200 ? 2 : 1}
                         />
+                        {value !== 0 && pos > 0 && pos < 400 && (
+                            <text
+                                x={5}
+                                y={pos + 4}
+                                fontSize="10"
+                                fill={textColor}
+                                textAnchor="start"
+                                style={{ pointerEvents: 'none' }}
+                            >
+                                {value}
+                            </text>
+                        )}
                     </g>
                 );
             })}
-            
-            {/* Label sumbu X (di bawah, sejajar dengan garis tengah horizontal) */}
+
+            {/* Label sumbu X di ujung kanan */}
             <text
-                x={380}
-                y={210}
+                x={585}
+                y={214}
                 fontSize="14"
                 fontWeight="bold"
                 fill={textColor}
@@ -516,11 +559,11 @@ const CanvasGrid = ({ theme }) => {
             >
                 X →
             </text>
-            
-            {/* Label sumbu Y (di kiri, sejajar dengan garis tengah vertikal) */}
+
+            {/* Label sumbu Y di ujung atas */}
             <text
-                x={190}
-                y={14}
+                x={290}
+                y={16}
                 fontSize="14"
                 fontWeight="bold"
                 fill={textColor}
@@ -529,70 +572,12 @@ const CanvasGrid = ({ theme }) => {
             >
                 ↑ Y
             </text>
-            
-            {/* Label angka pada sumbu X (bawah) */}
-            {Array.from({ length: 9 }, (_, i) => {
-                const pos = i * 50;
-                const value = pos - 200;
-                if (value !== 0) {
-                    return (
-                        <text
-                            key={`x-${i}`}
-                            x={pos}
-                            y={395}
-                            fontSize="10"
-                            fill={textColor}
-                            textAnchor="middle"
-                            style={{ pointerEvents: 'none' }}
-                        >
-                            {value}
-                        </text>
-                    );
-                }
-                return null;
-            })}
-            
-            {/* Label angka pada sumbu Y (kiri) */}
-            {Array.from({ length: 9 }, (_, i) => {
-                const pos = i * 50;
-                const value = 200 - pos;
-                if (value !== 0) {
-                    return (
-                        <text
-                            key={`y-${i}`}
-                            x={5}
-                            y={pos + 4}
-                            fontSize="10"
-                            fill={textColor}
-                            textAnchor="start"
-                            style={{ pointerEvents: 'none' }}
-                        >
-                            {value}
-                        </text>
-                    );
-                }
-                return null;
-            })}
-            
-            {/* Label 0 di tengah */}
-            <text
-                x={200}
-                y={395}
-                fontSize="10"
-                fill={textColor}
-                textAnchor="middle"
-                style={{ pointerEvents: 'none' }}
-            >
+
+            {/* Label 0 di sumbu X (tengah bawah) & sumbu Y (kiri tengah) */}
+            <text x={300} y={395} fontSize="10" fill={textColor} textAnchor="middle">
                 0
             </text>
-            <text
-                x={5}
-                y={204}
-                fontSize="10"
-                fill={textColor}
-                textAnchor="start"
-                style={{ pointerEvents: 'none' }}
-            >
+            <text x={5} y={204} fontSize="10" fill={textColor} textAnchor="start">
                 0
             </text>
         </svg>
@@ -630,11 +615,11 @@ const ActionButton = ({ onClick, icon, label, variant, disabled }) => {
             style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '8px 18px',
+                gap: '6px',
+                padding: '7px 15px',
                 borderRadius: '40px',
                 fontWeight: '500',
-                fontSize: '0.9rem',
+                fontSize: '0.88rem',
                 cursor: disabled ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s ease',
                 opacity: disabled ? 0.6 : 1,
@@ -661,17 +646,6 @@ const ActionButton = ({ onClick, icon, label, variant, disabled }) => {
         >
             {icon} {label}
         </button>
-    );
-};
-
-const App = () => {
-    return (
-        <Router basename="/turtle-editor-forkids">
-            <Routes>
-                <Route path="/" element={<HalamanUtama />} />
-                <Route path="/halaman-baru" element={<HalamanBaru />} />
-            </Routes>
-        </Router>
     );
 };
 
