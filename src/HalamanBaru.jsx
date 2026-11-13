@@ -220,7 +220,7 @@ const HalamanBaru = () => {
             transition: 'all 0.3s ease'
         }}>
             <Navbar expand="lg" style={{
-                backgroundColor: '#1e5631',
+                backgroundColor: '#1e2456',
                 borderBottom: 'none',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
             }}>
