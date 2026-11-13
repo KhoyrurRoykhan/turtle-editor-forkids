@@ -221,44 +221,44 @@ const HalamanUtama = () => {
             backgroundColor: currentTheme.background,
             transition: 'all 0.3s ease'
         }}>
-            <Navbar expand="lg" style={{
-                backgroundColor: '#1e5631',
-                borderBottom: 'none',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-            }}>
-                <Container fluid>
-                    <Navbar.Brand href="#" style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '1.5rem' }}>
-                        <FaCode />  Turtle Geometry
-                    </Navbar.Brand>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ backgroundColor: '#ffffff33', border: 'none' }} />
-                    <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
-                        <Nav.Link as={Link} to="/" style={{ color: '#ffffff', fontWeight: '500' }}>
-                            Halaman Utama
-                        </Nav.Link>
-                        <Nav.Link as={Link} to="/halaman-baru" style={{ color: '#ffffff', fontWeight: '500' }}>
-                            Halaman Baru
-                        </Nav.Link>
-                        <Nav>
-                            <Button
-                                variant="light"
-                                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px',
-                                    backgroundColor: '#ffffff',
-                                    color: '#1e5631',
-                                    border: 'none',
-                                    fontWeight: '500'
-                                }}
-                            >
-                                {theme === 'light' ? <BsMoon /> : <BsSun />}
-                                {theme === 'light' ? 'Mode Gelap' : 'Mode Terang'}
-                            </Button>
-                        </Nav>
-                    </Navbar.Collapse>
-                </Container>
-            </Navbar>
+<Navbar expand="lg" style={{
+    backgroundColor: '#1e5631',
+    borderBottom: 'none',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+}}>
+    <Container fluid>
+        <Navbar.Brand as={Link} to="/" style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '1.5rem' }}>
+            <FaCode /> Turtle Geometry
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ backgroundColor: '#ffffff33', border: 'none' }} />
+        <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
+            <Nav className="align-items-center gap-3">
+                <Nav.Link as={Link} to="/" style={{ color: '#ffffff', fontWeight: '500' }}>
+                    Halaman Utama
+                </Nav.Link>
+                <Nav.Link as={Link} to="/halaman-baru" style={{ color: '#ffffff', fontWeight: '500' }}>
+                    Halaman Baru
+                </Nav.Link>
+                <Button
+                    variant="light"
+                    onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        backgroundColor: '#ffffff',
+                        color: '#1e5631',
+                        border: 'none',
+                        fontWeight: '500'
+                    }}
+                >
+                    {theme === 'light' ? <BsMoon /> : <BsSun />}
+                    {theme === 'light' ? 'Mode Gelap' : 'Mode Terang'}
+                </Button>
+            </Nav>
+        </Navbar.Collapse>
+    </Container>
+</Navbar>
 
             <Container fluid style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
                 <div style={{
